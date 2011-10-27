@@ -1,6 +1,8 @@
 package logviewer
 
 class LogsController {
+
+    static levels = ["DEBUG", "WARN", "INFO", "ERROR", "FATAL"]
     def index = {
         Date lastFiveDays = new Date() - 5
         List errLevels = ["ERROR", "FATAL"]
@@ -15,7 +17,7 @@ class LogsController {
     def tail = {
         def level = "DEBUG"
         def recentMsgs = Logs.findAllByLevel(level,[max:50, sort:"timestamp", order:"desc"])
-        [levels:["DEBUG", "WARN", "INFO", "ERROR", "FATAL"], level:level, msgs: recentMsgs]
+        [levels:levels, level:level, msgs: recentMsgs]
     }
 
     def ajaxUpdateTail = {
@@ -30,7 +32,7 @@ class LogsController {
         def _level = "DEBUG"
         def q = ""
 
-        [levels:["DEBUG", "WARN", "INFO", "ERROR", "FATAL"],level:_level, query:q]
+        [levels:levels,level:_level, query:q]
     }
 
     def ajaxSearchLogs = {
@@ -61,6 +63,7 @@ class LogsController {
             eq("level", _level)
             if(q)
                 ilike("message", '%' + q+'%')
+            order("timestamp", "desc")
             maxResults(100)
         }
 
