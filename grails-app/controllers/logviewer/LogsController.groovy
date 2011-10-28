@@ -5,33 +5,51 @@ import logviewer.LogsService;
 class LogsController {
 	def logsService
 	
-    static levels = ["DEBUG", "WARN", "INFO", "ERROR", "FATAL"]
-    def index = {
+    static levels = ["ALL","DEBUG", "WARN", "INFO", "ERROR", "FATAL"]
+	static apps = ["App", "Cdn"]
+	
+	def index = {
+		redirect(action:cdnErrors)
+	}
+
+    def cdnErrors = {
         Date lastFiveDays = new Date() - 5
         List errLevels = ["ERROR", "FATAL"]
-        def errors = Logs.createCriteria().list{
+        def cdnErrors = CdnLog.createCriteria().list{
             'in'("level", errLevels)
             gt("timestamp", lastFiveDays)
             maxResults(50)
         }
-		def chartData = logsService.getChartData(errors)
-        [errors: errors.sort{it.timestamp}, chartData:chartData]
+
+		def cdnChartData = logsService.getChartData(cdnErrors)
+		
+        [cdnErrors: cdnErrors.sort{it.timestamp},cdnChartData:cdnChartData]
     }
 	
+	def appErrors = {
+		Date lastFiveDays = new Date() - 5
+    	List errLevels = ["ERROR", "FATAL"]
+    
+		def appErrors = AppLog.createCriteria().list{
+        	'in'("level", errLevels)
+        	gt("timestamp", lastFiveDays)
+        	maxResults(50)
+    	}
+		def appChartData = logsService.getChartData(appErrors)
 	
+    [appErrors:appErrors.sort{it.timestamp},appChartData:appChartData]
+	}
 	
     def tail = {
         def level = "DEBUG"
-        def recentMsgs = Logs.findAllByLevel(level,[max:50, sort:"timestamp", order:"desc"])
-        recentMsgs.sort{it.timestamp}
-		[levels:levels, level:level, msgs: recentMsgs]
+		def app = "cdn"
+		def recentMsgs = logsService.getTailData(level, app)
+		[levels:levels, apps:apps, level:level, app:app, msgs: recentMsgs]
     }
 
     def ajaxUpdateTail = {
         def level = params.level
-        log.debug("Getting new tail data")
-        def recentMsgs = Logs.findAllByLevel(level, [max:50, sort:"timestamp", order:"desc"])
-        recentMsgs.sort{it.timestamp}
+		def recentMsgs = logsService.getTailData(params.level, params.app)				
 		render(template:"tailData", model:[msgs:recentMsgs])
 
     }
@@ -40,7 +58,7 @@ class LogsController {
         def _level = "DEBUG"
         def q = ""
 
-        [levels:levels,level:_level, query:q]
+        [apps:apps, levels:levels,level:_level, query:q]
     }
 
     def ajaxSearchLogs = {
@@ -65,16 +83,30 @@ class LogsController {
         }
 
         endDate = endDate + 1
-
-        def searchResults = Logs.createCriteria().list{
+		def searchResults = []
+		if(params.app.toLowerCase() == 'cdn')
+		{
+			searchResults = CdnLog.createCriteria().list{
+	            between("timestamp", startDate, endDate)
+	            if(_level != "ALL")
+					eq("level", _level)
+	            if(q)
+	                ilike("message", '%' + q+'%')
+	            order("timestamp", "desc")
+	            maxResults(100)
+	        }
+		}
+		else{
+        	searchResults = AppLog.createCriteria().list{
             between("timestamp", startDate, endDate)
-            eq("level", _level)
+			if(_level != "ALL")
+				eq("level", _level)
             if(q)
                 ilike("message", '%' + q+'%')
             order("timestamp", "desc")
             maxResults(100)
-        }
-
+        	}
+		}
 		searchResults = searchResults.sort{it.timestamp}
         render(template:"searchResults", model:[results:searchResults])
     }

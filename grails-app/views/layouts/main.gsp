@@ -28,7 +28,8 @@
 			<div id="menu">
 	            <div class="topbar"></div>
 	            <ul class="claybricks">
-	                <li><g:link controller="logs" action="index">Errors</g:link></li>
+	                <li><g:link controller="logs" action="cdnErrors">CdnErrors</g:link></li>
+					<li><g:link controller="logs" action="appErrors">AppErrors</g:link></li>
 	                <li><g:link controller="logs" action="search">Search</g:link></li>
 	                <li class="selected"><g:link controller="logs" action="tail">Tail</g:link></li>
 	            </ul>

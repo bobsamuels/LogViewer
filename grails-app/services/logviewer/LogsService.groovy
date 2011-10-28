@@ -37,4 +37,23 @@ class LogsService {
 		def fatalCols = [['date', 'Day'], ['number', 'Fatal Count']]
 		['errStats':errStats, 'fatalStats':fatalStats, 'errCols':errCols, 'fatalCols':fatalCols]
 	}
+	
+	def getTailData(def level, def app)
+	{
+		def recentMsgs
+		if(app.toLowerCase() == "cdn")
+		{
+			if(level != "ALL")
+				recentMsgs = CdnLog.findAllByLevel(level,[max:50, sort:"timestamp", order:"desc"])
+			else
+				recentMsgs = CdnLog.list([max:50, sort:"timestamp", order:"desc"])
+		}
+		else{
+		if(level != "ALL")
+			recentMsgs = AppLog.findAllByLevel(level,[max:50, sort:"timestamp", order:"desc"])
+		else
+			recentMsgs = AppLog.list([max:50, sort:"timestamp", order:"desc"])
+		}
+        recentMsgs.sort{it.timestamp}
+	}
 }
