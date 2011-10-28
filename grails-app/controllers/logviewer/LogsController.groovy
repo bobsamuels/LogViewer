@@ -1,7 +1,10 @@
 package logviewer
+import logviewer.LogsService;
+
 
 class LogsController {
-
+	def logsService
+	
     static levels = ["DEBUG", "WARN", "INFO", "ERROR", "FATAL"]
     def index = {
         Date lastFiveDays = new Date() - 5
@@ -11,20 +14,25 @@ class LogsController {
             gt("timestamp", lastFiveDays)
             maxResults(50)
         }
-        [errors: errors]
+		def chartData = logsService.getChartData(errors)
+        [errors: errors.sort{it.timestamp}, chartData:chartData]
     }
-
+	
+	
+	
     def tail = {
         def level = "DEBUG"
         def recentMsgs = Logs.findAllByLevel(level,[max:50, sort:"timestamp", order:"desc"])
-        [levels:levels, level:level, msgs: recentMsgs]
+        recentMsgs.sort{it.timestamp}
+		[levels:levels, level:level, msgs: recentMsgs]
     }
 
     def ajaxUpdateTail = {
         def level = params.level
         log.debug("Getting new tail data")
         def recentMsgs = Logs.findAllByLevel(level, [max:50, sort:"timestamp", order:"desc"])
-        render(template:"tailData", model:[msgs:recentMsgs])
+        recentMsgs.sort{it.timestamp}
+		render(template:"tailData", model:[msgs:recentMsgs])
 
     }
 
@@ -67,7 +75,7 @@ class LogsController {
             maxResults(100)
         }
 
-
+		searchResults = searchResults.sort{it.timestamp}
         render(template:"searchResults", model:[results:searchResults])
     }
 }

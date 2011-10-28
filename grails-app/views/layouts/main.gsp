@@ -12,24 +12,30 @@
             <img src="${resource(dir:'images',file:'spinner.gif')}" alt="${message(code:'spinner.alt',default:'Loading...')}" />
         </div>
         <div>
-            <div id="icon" style="position: relative; float:left; width:320px;">
+            <div id="icon" style="position: relative; float:left; width:320px;margin-left:10px;">
                 <img src="${resource(dir:'images', file:'log.gif')}">
             </div>
-            <div id="title" style="position: relative; float:left; font-size: 30px; top:120px;">
+            <div id="title" style="position: absolute; float:left; font-size: 30px; left:30px; top:30px;">
                 Vitomy Log Reader
             </div>
+            <div id="slogan" style="position: relative; float:right; font-size: 25px; font:helvetica; font-style:oblique; margin-top:175px; margin-right:35px;">
+                Because you can't possibly like less, cat, grep, find, etc.....
+            </div>
+			
         </div>
-        <div style="clear:both"></div>
-        <div id="menu">
-            <div class="topbar"></div>
-            <ul class="claybricks">
-                <li><a href="http://www.dynamicdrive.com">Errors</a></li>
-                <li><a href="http://www.dynamicdrive.com/new.htm">Search</a></li>
-                <li class="selected"><a href="http://www.dynamicdrive.com/revised.htm">Tail</a></li>
-            </ul>
-        </div>
-        <div style="margin-left:15px;">
+        <div style="clear:both"></div>        
+        <div style="margin-left:25px;margin-right:25px; margin-top:-75px;position:relative;">
+			<div id="menu">
+	            <div class="topbar"></div>
+	            <ul class="claybricks">
+	                <li><g:link controller="logs" action="index">Errors</g:link></li>
+	                <li><g:link controller="logs" action="search">Search</g:link></li>
+	                <li class="selected"><g:link controller="logs" action="tail">Tail</g:link></li>
+	            </ul>
+	        </div>
+			<div id="body">
             <g:layoutBody />
+			</div>
         </div>
     </body>
 </html>

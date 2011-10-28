@@ -10,7 +10,8 @@ class Logs {
     String method
     String lineNumber
     String loggedClass
-
+	String host
+	
      static mapping = {
         loggedClass field:"class"
         collection "Logs"
@@ -20,5 +21,12 @@ class Logs {
     def getClassName(){
         loggedClass.split(":")[1].split(",")[0].replaceAll("\"", "")
     }
+
+	def getHostIP(){
+		def ip = host.split(":")[3]
+		ip = ip.replaceAll("\"", "")
+		ip = ip.replaceAll("}","")
+		ip
+	}
 
 }

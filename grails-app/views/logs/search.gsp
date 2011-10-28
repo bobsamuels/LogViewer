@@ -14,11 +14,12 @@
 	</script>
   </head>
   <body>
+	<br/>
     <g:formRemote name="searchLogs" url="[action:'ajaxSearchLogs']" update="searchResults">
         Start Date <input id="startDate" name="startDate" size="12" maxlength="10"/>
         End Date <input id="endDate" name="endDate" size="12" maxlength="10"/>
         Level <g:select name="level" from="${levels}" value="${level}"/>
-        Search For <g:textField name="query" size="100"/>
+        Search For <g:textField name="query" size="50"/>
         <g:submitButton name="submit" value="Search"/>
     </g:formRemote>
     <div id="searchResults"></div>
